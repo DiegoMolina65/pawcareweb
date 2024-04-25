@@ -488,24 +488,50 @@
 
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-      var addPetForm = document.getElementById('addPetForm'); // Asegúrate de usar el ID correcto del formulario
-    
+      var speciesSelect = document.getElementById('species'); // ID del campo de selección de especies
+      
+      // Cargar las especies al cargar la página
+      fetch('http://127.0.0.1:5000/species/list', { // Ajusta la URL para tu backend
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Error: ' + response.status + ' - ' + response.statusText); // Manejo de errores
+        }
+        return response.json(); // Convierte la respuesta en JSON
+      })
+      .then(data => {
+        data.forEach(species => { // Agrega las especies al select
+          var option = document.createElement('option'); // Crea una nueva opción
+          option.value = species.id; // El ID de la especie
+          option.textContent = species.name; // El nombre de la especie
+          speciesSelect.appendChild(option); // Añade la opción al select
+        });
+      })
+      .catch(error => {
+        console.error('Error al cargar las especies:', error); // Registra el error en la consola
+      });
+  
+      var addPetForm = document.getElementById('petForm'); // ID del formulario de registro de mascotas
+      
       addPetForm.addEventListener('submit', function(e) {
         e.preventDefault(); // Evita el comportamiento por defecto del formulario
-    
-        var petName = document.getElementById('petName').value; // ID para el campo del nombre
-        var speciesId = document.getElementById('species').value; // ID para el campo de la especie
-        var breed = document.getElementById('breed').value; // ID para el campo de la raza
-        var sex = document.getElementById('sex').value; // ID para el campo del sexo
-        var birthDate = document.getElementById('birthDate').value; // ID para el campo de la fecha de nacimiento
-        var petImage = document.getElementById('pet_image').files[0]; // ID para el campo de la imagen
-    
+  
+        var petName = document.getElementById('petName').value; 
+        var speciesId = document.getElementById('species').value; 
+        var breed = document.getElementById('breed').value;
+        var sex = document.getElementById('sex').value; 
+        var birthDate = document.getElementById('birthDate').value; 
+        var petImage = document.getElementById('petImage').files[0]; 
+      
         if (!petName || !speciesId || !breed || !sex || !birthDate || !petImage) {
           alert('Todos los campos son requeridos.');
           return;
         }
-    
-        // Construye el objeto FormData para manejar la subida de archivos
+      
         var formData = new FormData();
         formData.append('petName', petName);
         formData.append('speciesId', speciesId);
@@ -513,31 +539,58 @@
         formData.append('sex', sex);
         formData.append('birthDate', birthDate);
         formData.append('petImage', petImage);
-    
-        fetch('http://127.0.0.1:5000/pets/add', {
+      
+        fetch('http://127.0.0.1:5000/pets/add', { // Ajusta la URL para agregar mascotas
           method: 'POST',
-          headers: {
-            
-          },
-          body: formData, 
+          body: formData, // Uso de FormData para archivos
         })
         .then(response => {
           if (!response.ok) {
             throw new Error('Error: ' + response.status + ' - ' + response.statusText);
           }
-          return response.json();
+          return response.json(); 
         })
         .then(data => {
           alert('Mascota registrada exitosamente');
-          console.log('Mascota agregada:', data); // Puedes manejar los datos devueltos
+          console.log('Mascota agregada:', data);
         })
         .catch(error => {
           alert('Error al registrar la mascota.');
-          console.error('Error en la solicitud:', error);
+          console.error('Error en la solicitud:', error); // Manejo de errores
         });
       });
     });
-    
+  </script>
+  <script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const speciesSelect = document.getElementById('species'); // Campo de selección para especies
+
+    // Cargar las especies al cargar la página
+    fetch('/species/search', { // URL correcta
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json', // Tipo de contenido
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Error: ' + response.status + ' - ' + response.statusText);
+        }
+        return response.json(); // Convierte la respuesta en JSON
+    })
+    .then(species => {
+        species.forEach(s => { // Añade cada especie al campo de selección
+            const option = document.createElement('option');
+            option.value = s.id; // ID de la especie
+            option.textContent = s.name; // Nombre de la especie
+            speciesSelect.appendChild(option); // Añade la opción al campo de selección
+        });
+    })
+    .catch(error => {
+        console.error('Error al cargar las especies:', error); // Manejo de errores
+    });
+});
+
   </script>
 
 </body>

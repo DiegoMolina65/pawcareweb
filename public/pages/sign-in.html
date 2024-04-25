@@ -240,7 +240,7 @@
         .then(data => {
           alert('Inicio de sesión exitoso');
           console.log('Token recibido:', data.auth_token);  
-          window.location.href = '/public/pages/dashboard.html'; 
+          window.location.href = '/pages/dashboard.html'; 
         })
         .catch(error => {
           alert(error.message);  
